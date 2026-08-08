@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm --filter @us24/web build && node scripts/stage-web-output.mjs",
+  "buildCommand": "pnpm --filter @us24/web build",
   "installCommand": "pnpm install --frozen-lockfile",
   "outputDirectory": "dist",
   "framework": null,

@@ -6,7 +6,7 @@
   "description": "US24 Verification of Benefits operations workspace. React 19.2 + Vite 8.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && node ../../scripts/stage-web-output.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "analyze": "vite build --mode analyze"
