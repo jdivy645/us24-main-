@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+.vite/
+
+# Test output
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# ---------------------------------------------------------------------------
+# Private artifact storage (14_SECURITY_PRIVACY_ACCESSIBILITY.md, 12 §1)
+# Stands in for private S3-compatible object storage in local development.
+# Source artifacts and generated documents must NEVER be committed.
+# ---------------------------------------------------------------------------
+apps/api/.private-storage/
+apps/api/prisma/*.db
+apps/api/prisma/*.db-journal
+apps/api/prisma/migrations/dev.db*
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

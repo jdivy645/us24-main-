@@ -1,0 +1,512 @@
+/**
+ * US24 component styles — 04_UI_UX_DESIGN_SYSTEM.md §5–§13.
+ *
+ * 04 §5: "Use borders rather than shadows for most dense workspace panels."
+ * 04 §1: "Avoid oversized marketing headers, glassmorphism, gradients across the
+ * entire viewport, or excessive rounded cards."
+ */
+
+/* ---------------------------------------------------------------- Buttons */
+/* 04 §10: orange for the single primary action, navy for secondary high-value,
+   neutral outline for utilities, red only for destructive. */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font: inherit;
+  font-size: var(--text-input);
+  font-weight: var(--weight-label);
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) var(--ease),
+    border-color var(--motion-fast) var(--ease);
+}
+
+/*
+ * The brand orange stays exactly as 04 §2 specifies it (#E8761F). White text on
+ * it measures 2.98:1, which fails WCAG AA, so the primary button uses navy text
+ * instead — that keeps the identity intact at 4.97:1. 04 §15 requires contrast
+ * to meet the agreed level, and 04 §1 requires the navy/orange identity to be
+ * preserved rather than redesigned; navy-on-orange satisfies both.
+ *
+ * Hover lightens rather than darkens, because darkening would push the dark
+ * text back below the threshold.
+ */
+.btn--primary {
+  background: var(--us24-orange-600);
+  color: var(--us24-navy-900);
+  font-weight: 700;
+}
+.btn--primary:hover:not(:disabled) {
+  background: #f28a3c;
+}
+
+.btn--secondary {
+  background: var(--us24-navy-800);
+  color: #fff;
+}
+.btn--secondary:hover:not(:disabled) {
+  background: var(--us24-navy-900);
+}
+
+.btn--neutral {
+  background: var(--surface-card);
+  border-color: var(--border-default);
+  color: var(--text-default);
+}
+.btn--neutral:hover:not(:disabled) {
+  border-color: var(--us24-navy-700);
+}
+
+.btn--danger {
+  background: var(--danger-700);
+  color: #fff;
+}
+
+.btn--quiet {
+  background: transparent;
+  color: var(--us24-navy-700);
+  padding: 0 var(--space-2);
+  min-height: 28px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.btn--sm {
+  min-height: 28px;
+  font-size: var(--text-meta);
+  padding: 0 var(--space-3);
+}
+
+.btn:disabled {
+  background: var(--disabled-background);
+  border-color: var(--border-default);
+  color: var(--disabled-foreground);
+  cursor: not-allowed;
+}
+
+/* 04 §10: "Disable actions only when the reason is visible nearby." */
+.btn-with-reason {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-start;
+}
+.btn-reason {
+  font-size: var(--text-meta);
+  color: var(--text-muted);
+  max-width: 44ch;
+}
+
+/* ----------------------------------------------------------------- Cards */
+
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-block);
+  padding: var(--space-5);
+}
+
+.card__title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-card-title);
+  font-weight: var(--weight-card);
+  color: var(--text-strong);
+}
+
+.card__hint {
+  margin: 0;
+  font-size: var(--text-meta);
+  color: var(--text-muted);
+}
+
+/* 04 §5: an orange accent only for selected or highlighted business content. */
+.card--selected {
+  border-color: var(--us24-orange-600);
+  box-shadow: inset 3px 0 0 var(--us24-orange-600);
+}
+
+/* -------------------------------------------------------------- Badges */
+/* 04 §2: "Never use color alone to communicate a result" — every badge
+   renders an icon glyph and a text label. */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-chip);
+  border: 1px solid transparent;
+  font-size: var(--text-meta);
+  font-weight: var(--weight-label);
+  white-space: nowrap;
+}
+
+.badge--success { background: var(--success-050); color: var(--success-700); border-color: #b7e3d0; }
+.badge--danger  { background: var(--danger-050);  color: var(--danger-700);  border-color: #f3c4c0; }
+.badge--review  { background: var(--review-050);  color: var(--review-700);  border-color: #f2d5a8; }
+.badge--info    { background: var(--info-050);    color: var(--info-700);    border-color: #bcd9fb; }
+.badge--neutral { background: var(--disabled-background); color: var(--text-muted); border-color: var(--border-default); }
+.badge--processing { background: var(--info-050); color: var(--info-700); border-color: #bcd9fb; }
+
+.badge__icon {
+  font-size: 0.8em;
+  line-height: 1;
+}
+
+/* -------------------------------------------------------------- Chips */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-chip);
+  border: 1px solid var(--border-default);
+  background: var(--surface-card);
+  font-size: var(--text-meta);
+  color: var(--text-muted);
+}
+
+/* 04 §7: a blue source chip marks master-data provenance. */
+.chip--master { background: var(--info-050); color: var(--info-700); border-color: #bcd9fb; }
+/* 04 §7: derived uses an info/violet tone plus formula disclosure, NOT success. */
+.chip--derived { background: #f4f1fe; color: #5b3ec8; border-color: #d9d0f8; }
+.chip--transcript { background: var(--surface-card); }
+
+/* ------------------------------------------------------- Field blocks */
+/* 04 §6 anatomy, 09 §4 (red) and 09 §5 (amber). */
+
+.field-block {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-block);
+  background: var(--surface-card);
+  transition: border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
+}
+
+/* 09 §4: "Apply a two-pixel danger border to the entire field block." */
+.field-block--danger {
+  border: 2px solid var(--danger-700);
+  background: var(--danger-050);
+}
+
+/* 09 §5: "Apply a two-pixel amber border and pale amber background." */
+.field-block--review {
+  border: 2px solid var(--review-700);
+  background: var(--review-050);
+}
+
+.field-block--info { border-color: #bcd9fb; background: var(--info-050); }
+.field-block--muted { background: var(--disabled-background); }
+/* 09 §6: MATCH renders compactly without flooding the form green. */
+.field-block--success { border-color: #b7e3d0; }
+
+.field-block__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.field-block__label {
+  font-size: var(--text-field-label);
+  font-weight: var(--weight-label);
+  color: var(--text-strong);
+}
+
+.field-block__req {
+  color: var(--danger-700);
+  margin-left: 2px;
+}
+
+.field-block__pending {
+  font-size: var(--text-meta);
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.field-block__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.field-block__control input,
+.field-block__control select,
+.field-block__control textarea {
+  width: 100%;
+  min-height: 36px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-control);
+  background: var(--surface-card);
+  font: inherit;
+  font-size: var(--text-input);
+  color: var(--text-default);
+}
+
+.field-block__control textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
+.field-block__control input[aria-invalid='true'],
+.field-block__control select[aria-invalid='true'],
+.field-block__control textarea[aria-invalid='true'] {
+  border-color: var(--danger-700);
+}
+
+.field-block__readonly {
+  padding: var(--space-2) var(--space-3);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-control);
+  color: var(--text-muted);
+  background: var(--disabled-background);
+}
+
+/* 09 §4: the inline result region sits immediately below the control. */
+.field-result {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-1);
+}
+
+.field-result__message {
+  font-size: var(--text-meta);
+  color: var(--text-default);
+  margin: 0;
+}
+
+.field-result__supported {
+  font-size: var(--text-meta);
+  color: var(--text-strong);
+  font-weight: var(--weight-label);
+}
+
+.field-result__actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.field-result__note {
+  font-size: var(--text-meta);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* 09 §8 / 04 §3: evidence excerpts keep a readable line height. */
+.evidence {
+  border-left: 3px solid var(--us24-navy-700);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-card);
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  font-size: var(--text-meta);
+  line-height: 1.6;
+}
+
+.evidence__text {
+  margin: 0 0 var(--space-1);
+  color: var(--text-default);
+}
+
+.evidence__meta {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  color: var(--text-muted);
+}
+
+.evidence__candidates {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ------------------------------------------------------- Stage progress */
+
+.stages {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.stage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-control);
+  background: var(--surface-card);
+  font-size: var(--text-meta);
+}
+
+.stage--COMPLETE { border-color: #b7e3d0; color: var(--success-700); }
+.stage--ACTIVE   { border-color: var(--info-700); color: var(--info-700); }
+.stage--FAILED   { border-color: var(--danger-700); color: var(--danger-700); }
+.stage--WARNING  { border-color: var(--review-700); color: var(--review-700); }
+.stage--SKIPPED  { color: var(--disabled-foreground); }
+.stage--PENDING  { color: var(--text-muted); }
+
+/* ------------------------------------------------------------- Tables */
+/* 04 §12: sticky headers on Records and Review Queue. */
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-block);
+  background: var(--surface-card);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-meta);
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--border-default);
+  white-space: nowrap;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-card);
+  z-index: 1;
+  font-weight: var(--weight-label);
+  color: var(--text-muted);
+}
+
+.table tbody tr:hover {
+  background: var(--surface-canvas);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* --------------------------------------------------------- Empty states */
+/* 05 §18: every empty state explains itself and offers a next action. */
+
+.empty {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  padding: var(--space-6);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-block);
+  background: var(--surface-card);
+}
+
+.empty__title {
+  margin: 0;
+  font-size: var(--text-card-title);
+  font-weight: var(--weight-card);
+  color: var(--text-strong);
+}
+
+.empty__body {
+  margin: 0;
+  color: var(--text-muted);
+  max-width: 62ch;
+}
+
+/* -------------------------------------------------------------- Dialogs */
+/* 04 §15 / 15 §19: dialogs trap focus and return it to the invoking control. */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(15 27 45 / 45%);
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  z-index: 50;
+}
+
+.dialog {
+  background: var(--surface-card);
+  border-radius: var(--radius-block);
+  box-shadow: var(--shadow-dialog);
+  padding: var(--space-6);
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.dialog__title {
+  margin: 0;
+  font-size: var(--text-section-title);
+  font-weight: var(--weight-title);
+  color: var(--text-strong);
+}
+
+.dialog__actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* 05 §17 / 13 §11: full-screen dialogs at mobile widths (04 §13). */
+@media (max-width: 640px) {
+  .dialog {
+    width: 100%;
+    max-height: 100vh;
+    height: 100%;
+    border-radius: 0;
+  }
+}
+
+/* ------------------------------------------------------------- Banners */
+
+.banner {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-block);
+  border: 1px solid var(--border-default);
+  font-size: var(--text-meta);
+}
+
+.banner--info { background: var(--info-050); border-color: #bcd9fb; color: var(--info-700); }
+.banner--review { background: var(--review-050); border-color: #f2d5a8; color: var(--review-700); }
+.banner--danger { background: var(--danger-050); border-color: #f3c4c0; color: var(--danger-700); }
+
+/* ----------------------------------------------------------- Utilities */
+
+.stack { display: grid; }
+.stack--1 { gap: var(--space-1); }
+.stack--2 { gap: var(--space-2); }
+.stack--3 { gap: var(--space-3); }
+.stack--4 { gap: var(--space-4); }
+.stack--6 { gap: var(--space-6); }
+
+.row { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.row--between { justify-content: space-between; }
+.muted { color: var(--text-muted); }
+.meta { font-size: var(--text-meta); color: var(--text-muted); }

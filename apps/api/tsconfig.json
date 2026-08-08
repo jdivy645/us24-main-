@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"],
+    "paths": {
+      "@us24/domain": ["../../packages/domain/src/index.ts"],
+      "@us24/schemas": ["../../packages/schemas/src/index.ts"],
+      "@us24/testing": ["../../packages/testing/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

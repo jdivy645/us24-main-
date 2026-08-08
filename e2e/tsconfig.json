@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"],
+    // page.evaluate() callbacks execute in the browser, so DOM globals are in
+    // scope inside them even though the test file itself runs in Node.
+    "lib": ["ES2023", "DOM", "DOM.Iterable"]
+  },
+  "include": ["**/*.ts"]
+}

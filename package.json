@@ -1,0 +1,40 @@
+{
+  "name": "us24-vob-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "US24 Solutions — React VOB Automation Platform. Implements the 18-file Markdown blueprint at the repository root.",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter=./packages/* build && pnpm --filter @us24/api build && pnpm --filter @us24/web build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "test": "vitest run --project domain --project schemas --project api --project web",
+    "test:watch": "vitest",
+    "test:golden": "vitest run --project domain -t \"golden\"",
+    "test:e2e": "pnpm seed && pnpm --filter @us24/e2e test",
+    "test:a11y": "pnpm --filter @us24/e2e test:a11y",
+    "dev": "concurrently -n api,web -c cyan,magenta \"pnpm --filter @us24/api dev\" \"pnpm --filter @us24/web dev\"",
+    "db:push": "pnpm --filter @us24/api db:push",
+    "seed": "pnpm --filter @us24/api seed",
+    "setup": "pnpm install && pnpm db:push && pnpm seed",
+    "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.0",
+    "@types/node": "22.19.0",
+    "concurrently": "9.2.1",
+    "eslint": "9.39.0",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "globals": "16.5.0",
+    "prettier": "3.6.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.46.0",
+    "vitest": "3.2.4"
+  }
+}
