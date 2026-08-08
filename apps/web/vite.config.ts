@@ -23,6 +23,8 @@ export default defineConfig({
     proxy: { '/v1': { target: 'http://127.0.0.1:3001', changeOrigin: true } },
   },
   build: {
+    // Stays at apps/web/dist so `vite preview` works. The deploy gets a copy at
+    // the repository root via scripts/stage-web-output.mjs — see vercel.json.
     sourcemap: true,
     rollupOptions: {
       output: {
