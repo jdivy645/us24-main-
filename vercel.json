@@ -1,37 +1,21 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-
-  "//": [
-    "This deploys apps/web ONLY — the React SPA. The API is NOT deployed here and",
-    "cannot be: it is a long-lived Fastify process with a SQLite file, local file",
-    "storage and open SSE streams. See DEPLOYMENT.md.",
-    "",
-    "Set the Vercel project's Root Directory to the REPOSITORY ROOT, not apps/web.",
-    "apps/web/vite.config.ts aliases into ../../packages/*/src, so a scoped root",
-    "directory cannot resolve the workspace packages."
-  ],
-
   "buildCommand": "pnpm --filter @us24/web build",
   "installCommand": "pnpm install --frozen-lockfile",
   "outputDirectory": "apps/web/dist",
   "framework": null,
-
   "rewrites": [
     {
-      "//": "Proxy the API so the SPA stays same-origin. This is what keeps BASE='/v1' in apps/web/src/lib/api.ts and the relative EventSource in routes/processing.tsx working unchanged, and keeps CORS out of the picture entirely. Replace the host below with your API deployment.",
       "source": "/v1/:path*",
       "destination": "https://REPLACE-WITH-YOUR-API-HOST/v1/:path*"
     },
     {
-      "//": "SPA fallback. Static files are served first, so this only catches client-side routes such as /records/:id and /verifications/:id/workspace.",
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
-
   "headers": [
     {
-      "//": "14 §/11 §18 security posture at the static edge. The API sets its own CSP via helmet; this covers the documents the CDN serves.",
       "source": "/(.*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
@@ -39,15 +23,10 @@
         { "key": "Referrer-Policy", "value": "same-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
         {
-          "//": "11 §18: no public CDN scripts. Everything is bundled, so 'self' is sufficient.",
           "key": "Content-Security-Policy",
           "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'"
         },
-        {
-          "//": "ADR-008: there is no login. This application must never be indexed or cached by a shared proxy.",
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        }
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]
     },
     {

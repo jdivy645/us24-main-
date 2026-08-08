@@ -23,7 +23,8 @@
     "db:push": "pnpm --filter @us24/api db:push",
     "seed": "pnpm --filter @us24/api seed",
     "setup": "pnpm install && pnpm db:push && pnpm seed",
-    "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+    "verify": "pnpm check:vercel && pnpm typecheck && pnpm lint && pnpm test && pnpm build",
+    "check:vercel": "node scripts/check-vercel-config.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.0",
