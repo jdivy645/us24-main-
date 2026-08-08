@@ -5,6 +5,8 @@
  * 15 §17 (PDF gating), 15 §20 (security), 09 §16, 12 §3, 12 §7.
  */
 
+import { rmSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { COMPLETED_FORM_VALUES, loadGoldenFixture } from '@us24/testing';
 import { FIELD_REGISTRY } from '@us24/domain';
@@ -13,11 +15,17 @@ import { buildApp, type BuiltApp } from '../src/app.js';
 let built: BuiltApp;
 let caseId: string;
 let originRevisionId: string;
+let storageRoot: string;
 
 beforeAll(async () => {
+  // Anchored to this file rather than process.cwd(): the vitest api project runs
+  // from the repo root, so a cwd-relative path scattered artifacts into a second
+  // .private-storage/ directory that then got committed.
+  storageRoot = fileURLToPath(new URL(`../.private-storage/test-${Date.now()}`, import.meta.url));
+
   built = await buildApp({
     databasePath: ':memory:',
-    storageRoot: `${process.cwd()}/.private-storage/test-${Date.now()}`,
+    storageRoot,
   });
 
   const fixture = loadGoldenFixture();
@@ -50,6 +58,9 @@ beforeAll(async () => {
 afterAll(async () => {
   await built.app.close();
   built.db.close();
+  // Generated documents are real files. Leaving them behind is how they ended
+  // up in version control the first time.
+  rmSync(storageRoot, { recursive: true, force: true });
 });
 
 describe('request validation (12 §3)', () => {

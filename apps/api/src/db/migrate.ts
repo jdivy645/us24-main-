@@ -6,7 +6,7 @@
  * so a change is visible rather than silent.
  */
 
-import { applySchema, openDatabase } from './database.js';
+import { applySchema, openDatabase, queryAll } from './database.js';
 import { loadConfig } from '../config.js';
 
 const config = loadConfig();
@@ -14,9 +14,10 @@ const db = openDatabase(config.databasePath);
 
 applySchema(db);
 
-const tables = db
-  .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
-  .all() as { name: string }[];
+const tables = queryAll<{ name: string }>(
+  db,
+  "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name",
+);
 
  
 console.log(`Schema applied to ${config.databasePath}`);

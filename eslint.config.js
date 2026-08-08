@@ -29,6 +29,19 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
 
   {
+    // Build and tooling scripts run in Node and report to the console by design.
+    files: ['**/*.mjs', '**/*.cjs', 'eslint.config.js'],
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: 'module',
+      globals: { ...globals.node },
+    },
+    rules: {
+      'no-console': 'off',
+    },
+  },
+
+  {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2023,

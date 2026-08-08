@@ -24,6 +24,47 @@ import { dirname } from 'node:path';
 
 export type Db = DatabaseSync;
 
+/**
+ * Typed query helpers.
+ *
+ * `node:sqlite` types a row as `Record<string, SQLOutputValue>`, which does not
+ * overlap with a declared row interface, so `stmt.get(...) as CaseRow` is a
+ * conversion TypeScript may reject outright. Whether it does depends on the
+ * resolved @types/node version — a build that passes locally can fail in CI on
+ * a different one, which is exactly what happened on the first deploy.
+ *
+ * These helpers perform the widening through `unknown` ONCE, in one documented
+ * place, so no call site carries a fragile double cast and the behaviour is the
+ * same under every @types/node version.
+ *
+ * The conversion is sound because every row type in `repository.ts` mirrors a
+ * table declared in `SCHEMA_SQL` below, and SQLite columns only ever produce
+ * null, number, bigint, string or Uint8Array. It is NOT validated at runtime:
+ * a schema change without a matching interface change is a silent mismatch, so
+ * the two are kept adjacent and changed together.
+ */
+/**
+ * Values SQLite can bind to a statement parameter.
+ *
+ * Declared here rather than imported from `node:sqlite` so the helper signatures
+ * do not themselves depend on the @types/node version — which is the whole point
+ * of this module. It is the same set the driver accepts.
+ */
+export type SqlParam = null | number | bigint | string | Uint8Array;
+
+export function queryOne<T>(db: Db, sql: string, ...params: readonly SqlParam[]): T | undefined {
+  return db.prepare(sql).get(...params) as unknown as T | undefined;
+}
+
+export function queryAll<T>(db: Db, sql: string, ...params: readonly SqlParam[]): T[] {
+  return db.prepare(sql).all(...params) as unknown as T[];
+}
+
+/** Statement execution for writes. Kept alongside the readers for symmetry. */
+export function execute(db: Db, sql: string, ...params: readonly SqlParam[]): void {
+  db.prepare(sql).run(...params);
+}
+
 let instance: Db | null = null;
 
 export function openDatabase(path: string): Db {

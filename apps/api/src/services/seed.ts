@@ -18,6 +18,7 @@ import {
   validValueFor,
 } from '@us24/testing';
 import { buildApp } from '../app.js';
+import { queryAll, queryOne } from '../db/database.js';
 
 const now = (): string => new Date().toISOString();
 const id = (prefix: string): string => `${prefix}_${randomUUID()}`;
@@ -37,11 +38,10 @@ const { app, repo, cases, db, config } = await buildApp();
  */
 function resetDemoData(): void {
   db.exec('PRAGMA foreign_keys = OFF');
-  const tables = db
-    .prepare(
-      "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'",
-    )
-    .all() as { name: string }[];
+  const tables = queryAll<{ name: string }>(
+    db,
+    "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'",
+  );
   for (const table of tables) db.exec(`DELETE FROM ${table.name}`);
   db.exec('PRAGMA foreign_keys = ON');
 }
@@ -60,9 +60,11 @@ function seedCarriers(): void {
       'INSERT OR IGNORE INTO insurance_carrier (id, canonical_name, aliases, created_at) VALUES (?, ?, ?, ?)',
     ).run(carrierId, carrier.name, JSON.stringify([]), now());
 
-    const row = db
-      .prepare('SELECT id FROM insurance_carrier WHERE canonical_name = ?')
-      .get(carrier.name) as { id: string };
+    const row = queryOne<{ id: string }>(
+      db,
+      'SELECT id FROM insurance_carrier WHERE canonical_name = ?',
+      carrier.name,
+    )!;
 
     // 10 §13: a master must carry its scope, and 10 §15 says only ACTIVE
     // versions auto-fill. One carrier is deliberately left with a PROPOSED
@@ -366,9 +368,10 @@ function seedRecords(goldenCaseId: string): void {
     'INSERT INTO patient (id, last_name, first_name, date_of_birth, created_at) VALUES (?, ?, ?, ?, ?)',
   ).run(patientId, 'Rivera', 'Dominic', '2010-10-07', now());
 
-  const carrier = db
-    .prepare("SELECT id FROM insurance_carrier WHERE canonical_name = 'Cigna ASH'")
-    .get() as { id: string };
+  const carrier = queryOne<{ id: string }>(
+    db,
+    "SELECT id FROM insurance_carrier WHERE canonical_name = 'Cigna ASH'",
+  )!;
 
   const policyId = id('policy');
   db.prepare(

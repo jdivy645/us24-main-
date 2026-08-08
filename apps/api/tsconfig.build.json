@@ -1,5 +1,10 @@
 {
+  // Typecheck-only config for the production build. The bundle itself is
+  // produced by build.mjs (esbuild) — see the comment there for why tsc alone
+  // cannot emit a runnable artifact from this workspace layout.
+  //
+  // Deliberately carries NO outDir/rootDir: emitting from here would create a
+  // nested dist/apps/** + dist/packages/** tree beside the bundle.
   "extends": "./tsconfig.json",
-  "compilerOptions": { "noEmit": false, "outDir": "dist", "rootDir": "../.." },
   "include": ["src/**/*.ts"]
 }

@@ -192,6 +192,74 @@ evidence therefore routes to review regardless of field.
 
 ---
 
+## ADR-018 — One widening point for SQLite rows, and one pinned `@types/node`
+
+**Context.** The first CI build failed with `TS2352` on five row conversions in
+`repository.ts` that compiled cleanly on the development machine.
+
+**Root cause.** Two faults, one hiding the other.
+
+1. `apps/api` never declared `@types/node`. It resolved whatever the workspace
+   hoisted, so local and CI typechecked against different definitions of
+   `node:sqlite`.
+2. The five failing sites were of the form `stmt.get(...) as CaseRow | undefined`.
+   TypeScript accepts a conversion when *either* side is comparable to the other,
+   and a union satisfies that through any single member — here the `undefined`
+   leg. The incompatible `Record<string, SQLOutputValue> → CaseRow` leg was never
+   checked. CI resolved a version whose `get()` returns the row type **without**
+   `| undefined`, which removed the leg that was carrying the conversion. The
+   `.all()` sites had already needed hand-patching for exactly this reason:
+   arrays have no `undefined` member to hide behind.
+
+**Decision.**
+- Widen through `unknown` in one documented place — `queryOne` / `queryAll` /
+  `execute` in `db/database.ts`, with thin `one` / `many` / `run` delegates on
+  `Repository`. `unknown → T` is legal under every past and future typing.
+- Declare `@types/node` in every package that consumes Node types, and add a
+  `pnpm.overrides` entry so a transitive optional peer cannot introduce a second
+  version. Verified: exactly one version resolves workspace-wide.
+- Parameters are typed `SqlParam` (declared locally, not imported from
+  `node:sqlite`) rather than cast to `never[]`, which had disabled the driver's
+  bind-parameter checking entirely.
+
+**Rejected.** Changing `interface CaseRow` to `type CaseRow`. Type aliases get an
+implicit index signature and interfaces do not, so it would compile — by accident,
+and it would break again the moment a row type gained a non-SQL field.
+
+**Consequence.** The conversion is not runtime-validated. Every row interface
+mirrors a table in `SCHEMA_SQL`, and the two are kept adjacent so a schema change
+without a matching interface change is visible in review.
+
+---
+
+## ADR-019 — The API is not deployed to Vercel
+
+**Decision.** Deploy `apps/web` to Vercel as a static SPA. Host `apps/api` on a
+platform that runs a process, with a mounted volume and exactly one replica.
+Proxy `/v1/*` from the frontend so the SPA stays same-origin.
+
+**Reason.** `apps/api` is a long-lived server, not a request handler, and four
+of its components are incompatible with a serverless runtime: a SQLite file on a
+read-only filesystem, artifact files on local disk, an in-process job runner
+holding idempotency state in memory, and SSE streams that outlive a function
+invocation. Full analysis in `DEPLOYMENT.md`.
+
+Pointing SQLite at `/tmp` was considered and rejected as **worse than failing**:
+`CREATE TABLE IF NOT EXISTS` would make an empty database look healthy while
+cases silently vanished and instances diverged. Silent loss of audit history is
+the exact failure this design exists to prevent.
+
+**Consequence.** Deployment costs a Dockerfile, a `vercel.json` and environment
+variables — no application code changes. Moving the API to a serverless runtime
+later is a rewrite, not a configuration change: `node:sqlite` is synchronous, so
+replacing it turns every repository method and every caller async, including the
+synchronous flush loop in the SSE handler.
+
+**Status.** Accepted. Does not alter ADR-008 — neither deployment may be exposed
+without an approved controlled-access boundary.
+
+---
+
 ## Also deferred
 
 | Item | Reason | Unblocked by |

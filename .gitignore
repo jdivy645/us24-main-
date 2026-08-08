@@ -19,7 +19,9 @@ blob-report/
 # Stands in for private S3-compatible object storage in local development.
 # Source artifacts and generated documents must NEVER be committed.
 # ---------------------------------------------------------------------------
-apps/api/.private-storage/
+# Any location — the vitest api project runs from the repo root, so artifacts
+# land at ./.private-storage/ as well as apps/api/.private-storage/.
+.private-storage/
 apps/api/prisma/*.db
 apps/api/prisma/*.db-journal
 apps/api/prisma/migrations/dev.db*
