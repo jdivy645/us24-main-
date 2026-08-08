@@ -56,6 +56,27 @@ test.describe('no route is blank (05 §18)', () => {
     await expect(page.getByRole('link', { name: 'Go to Records' })).toBeVisible();
   });
 
+  test('the shell survives a route error so the operator can navigate away (05 §1)', async ({
+    page,
+  }) => {
+    // 05 §1: "The shell persists during loading and error states."
+    // Simulate the API being unreachable — the exact state of a fresh deploy
+    // whose /v1 rewrite has not been pointed at a running API yet.
+    await page.route('**/v1/**', (route) => route.abort('failed'));
+    await page.goto('/records');
+
+    await expect(page.getByRole('heading', { name: /could not load/i })).toBeVisible();
+
+    // The rail must still be there. An errorElement on the shell route instead
+    // of the child routes replaces the whole application and strands the user.
+    await expect(page.getByRole('navigation', { name: 'Primary' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Help/ })).toBeVisible();
+
+    // And it must actually work: Help needs no API, so it renders fully.
+    await page.getByRole('link', { name: /Help/ }).click();
+    await expect(page.getByRole('heading', { name: 'Help', level: 1 })).toBeVisible();
+  });
+
   test('there is no sign-in, profile or sign-out control (ADR-008, 03 §1)', async ({ page }) => {
     await page.goto('/records');
     for (const forbidden of ['Sign in', 'Log in', 'Sign out', 'Log out', 'Profile', 'My account']) {

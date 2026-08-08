@@ -21,11 +21,25 @@ import { TemplatesRoute } from '../routes/templates.js';
 import { SystemRoute } from '../routes/system.js';
 import { HelpRoute } from '../routes/help.js';
 
+/**
+ * 05 §1: "The shell persists during loading and error states."
+ *
+ * An `errorElement` replaces the element of the route it is attached to. Put it
+ * on the shell route and a failing child takes the whole application with it —
+ * top bar, navigation rail and all — stranding the operator on a dead page with
+ * no way out. Attaching it to each CHILD renders the error inside the shell's
+ * Outlet instead, so the rail stays usable and the operator can navigate away.
+ */
+const withErrorBoundary = <T extends { element: React.JSX.Element }>(routes: T[]): T[] =>
+  routes.map((route) => ({ ...route, errorElement: <RouteErrorBoundary /> }));
+
 export const router = createBrowserRouter([
   {
     element: <AppShell />,
+    // Last resort only: an error thrown by the shell itself has no surviving
+    // shell to render inside.
     errorElement: <RouteErrorBoundary />,
-    children: [
+    children: withErrorBoundary([
       // 03 §2: "`/` redirects to `/verifications/new`" because it is the
       // highest-frequency task (03 §1).
       { index: true, element: <Navigate to="/verifications/new" replace /> },
@@ -51,6 +65,6 @@ export const router = createBrowserRouter([
 
       // 05 §18: an unknown route explains itself and offers safe navigation.
       { path: '*', element: <NotFoundRoute /> },
-    ],
+    ]),
   },
 ]);
